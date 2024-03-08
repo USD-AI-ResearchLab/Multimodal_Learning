@@ -1,9 +1,9 @@
 
 # Multimodal Learning: Generating Precise Chest X-Ray Report on Thorax Abnormality 
 
-# Appilied Artificial Intelligence Research Lab, University of South Dakota,
+## Appilied Artificial Intelligence Research Lab, University of South Dakota,
 Vermillion, SD, 57069, USA
-gaurab.subedi@coyotes.usd.edu 
+gaurab.subedi@coyotes.usd.edu, 
 jayakumar.pujar@coyotes.usd.edu 
 
 Department of Computer Science, University of South Dakota, Vermillion, SD,
@@ -19,35 +19,31 @@ Chronic respiratory diseases, ranking as the third leading cause of death worldw
 
 Encoder-decoder architecture where we used ResNet-152 CNN as an image encoder which extracts global and local visual features. LSTM is used as sentence decoder which generates sentences sequentially using image features and previous sentence where attention mechanism focuses on relevant image regions for each sentence. 
 
-    Training: Trained end to end using IU datasets. Optimized cross-entropy loss between generated and ground truth sentences. Teacher forcing is used for training and greedy search for testing. 
+Training: Trained end to end using IU datasets. Optimized cross-entropy loss between generated and ground truth sentences. Teacher forcing is used for training and greedy search for testing. 
 
-    Evaluation Metrices: We used Natural Language Generation (NLG) Metrices like BLEU, ROGUE, CIDER. Higher scores are achieved when compared with different models which demonstrate their effectiveness. 
+Evaluation Metrices: We used Natural Language Generation (NLG) Metrices like BLEU, ROGUE, CIDER. Higher scores are achieved when compared with different models which demonstrate their effectiveness. 
 
 ## Getting started
 
 ```
 $ pip install -r requirements.txt
-
 ```
 This Python script defines classes and functions for processing a JSON file, building a vocabulary from it, and saving that vocabulary as a pickle file.
 
 ```
 $ cd IUdata
 $ python3 vocab_creation.py
-
 ```
 Convert XML file to JSON file for training
 
 ```
 $ python3 convert_XML_to_json.py
-
 ```
 Provide the dataset path and adjust hyperparameters in training file
-
 ```
 $ cd ..
 ```
-python3 
+    #path
     parser.add_argument('--model_path', type=str, default='model_weights/', help='path for saving checkpoints')
     parser.add_argument('--vocab_path', type=str, default='IUdata/data_vocab.pkl', help='path for vocabulary wrapper')
     parser.add_argument('--image_dir', type=str, default='IUdata/FrontalView_IUXRay', help='directory for X-ray images')
@@ -68,13 +64,11 @@ python3
 
 ```
 $ python3 training.py
-
 ```
 Similarly adjust the dataset path in testing file
 
 ```
 $ python3 testing.py
-
 ```
 
 ## Dataset
