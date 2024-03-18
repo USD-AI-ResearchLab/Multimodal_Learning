@@ -58,7 +58,7 @@ $ cd ..
     parser.add_argument('--teach_rate', type=float, default=1.0, help='The teach forcing rate in training')
     parser.add_argument('--learning_rate', type=float, default=1e-4, help='The learning rate in training')
     parser.add_argument('--epochs', type=int, default=100, help='The epochs in training')
-    parser.add_argument('--sche_step_size', type=int, default=5,
+    parser.add_argument('--sche_step_size', type=int, default=5)
     parser.add_argument('--dropout_rate', type=float, default=0.2, help='The dropout rate for both encoder and decoder')
     parser.add_argument('--eval_json_dir', type=str, default='IUdata/data_test.json', help='the path for json file')
 
