@@ -1,0 +1,8 @@
+2024-04-08 16:58:53,668 =======================================================
+2024-04-08 16:58:53,668 Namespace(model_path='model_weights/', vocab_path='IUdata/data_vocab.pkl', image_dir='IUdata/FrontalView_IUXRay', json_dir='IUdata/data_trainval.json', log_path='./results', resize_size=256, crop_size=224, batch_size=32, num_workers=4, embed_size=512, hidden_size=512, num_global_features=2560, imp_layers_num=1, fin_num_layers=2, sen_enco_num_layers=3, num_local_features=2048, num_regions=49, num_conv1d_out=1024, teach_rate=1.0, learning_rate=0.0001, epochs=10, sche_step_size=5, sche_decay=0.9, log_step=50, save_step=2, lambda_imp=0.5, lambda_fin=0.5, fix_image_encoder=True, dropout_rate=0, log_metrics_step=1, train_separately=True, imp_fin_only=True, eval_json_dir='IUdata/data_test.json', eval_batch_size=75, max_impression_len=15, max_single_sen_len=15, max_sen_num=7, single_punc=True)
+2024-04-08 16:58:53,668 =======================================================
+2024-04-08 16:58:53,668 Start the 1th run of the same model
+2024-04-08 17:39:10,258 The model performance improved when epoch [1/10], BLEU4:0.0178
+2024-04-08 18:18:29,393 The model performance improved when epoch [2/10], BLEU4:0.0367
+2024-04-08 18:56:20,625 The model performance improved when epoch [3/10], BLEU4:0.1041
+2024-04-08 19:33:58,308 The model performance improved when epoch [4/10], BLEU4:0.1479

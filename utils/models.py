@@ -6,31 +6,80 @@ from torch.nn.utils.rnn import pad_packed_sequence
 from torch.nn import init
 import torch.nn.functional as F
 import random
+from torchsummary import summary
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
+# class EncoderCNN(nn.Module):
+#     def __init__(self):
+#         """Load the pretrained DenseNet-121, and extract local and global features"""
+#         super(EncoderCNN, self).__init__()
+
+#         # load pretrained model from ImageNet
+#         resnet = models.resnet152(weights='ResNet152_Weights.DEFAULT')
+#         local_features_mod = list(resnet.children())[:8]
+#         global_features_mod = list(resnet.children())[8]
+
+#         self.resnet_local = nn.Sequential(*local_features_mod)
+#         self.resnet_global = nn.Sequential(global_features_mod)
+#         # Print the summaries
+#         print("Local Features Module Summary:")
+#         print(self.resnet_local)
+#         print("\nGlobal Features Module Summary:")
+#         print(self.resnet_global)
+
+#     def forward(self, frontal_image):
+#         """Extract feature vectors from input images"""
+#         # Does not train convolutional layers
+#         with torch.no_grad():
+#             local_features = self.resnet_local(frontal_image)
+#             global_features = self.resnet_global(local_features).squeeze()
+
+#         return global_features
+    
+# encoder_cnn = EncoderCNN()
+# if torch.cuda.is_available():
+#     encoder_cnn = encoder_cnn.cuda()
+# summary(encoder_cnn, (3, 224, 224))
+
+
 class EncoderCNN(nn.Module):
     def __init__(self):
-        """Load the pretrained DenseNet-121, and extract local and global features"""
+        """Load the pretrained EfficientNet-B7, and extract local and global features"""
         super(EncoderCNN, self).__init__()
 
         # load pretrained model from ImageNet
-        resnet = models.resnet152(weights='ResNet152_Weights.DEFAULT')
-        local_features_mod = list(resnet.children())[:8]
-        global_features_mod = list(resnet.children())[8]
+        efficientnet = models.efficientnet_b7(pretrained=True)
 
-        self.resnet_local = nn.Sequential(*local_features_mod)
-        self.resnet_global = nn.Sequential(global_features_mod)
+        # EfficientNet does not have an explicit layer division as ResNet, 
+        # but we can divide it based on features and classifier.
+        # Extracting features part as local feature extraction
+        self.efficientnet_local = nn.Sequential(*list(efficientnet.children())[:-2])
+
+        # The global feature can be the output of the network without the final classifier
+        self.efficientnet_global = nn.Sequential(list(efficientnet.children())[-2])
+
+        # Print the summaries
+        print("Local Features Module Summary:")
+        print(self.efficientnet_local)
+        print("\nGlobal Features Module Summary:")
+        print(self.efficientnet_global)
 
     def forward(self, frontal_image):
         """Extract feature vectors from input images"""
         # Does not train convolutional layers
         with torch.no_grad():
-            local_features = self.resnet_local(frontal_image)
-            global_features = self.resnet_global(local_features).squeeze()
+            # Extracting local features
+            local_features = self.efficientnet_local(frontal_image)
 
+            # EfficientNet uses Adaptive Average Pooling before the final classifier,
+            # so we should apply it to get the global features.
+            global_features = self.efficientnet_global(local_features).squeeze()
+            
+        #print(global_features.shape)
         return global_features
+        
 
 
 class Impression_Decoder(nn.Module):
@@ -39,6 +88,7 @@ class Impression_Decoder(nn.Module):
         """Set the hyper-parameters and build the layers for impression decoder"""
         super(Impression_Decoder, self).__init__()
         # from frontal images
+        
         self.visual_embed = nn.Linear(num_global_features, embed_size)
         self.word_embed = nn.Embedding(vocab_size, embed_size)
         self.lstm = nn.LSTM(embed_size, hidden_size, num_layers, batch_first=True, dropout=dropout_rate)
@@ -56,6 +106,7 @@ class Impression_Decoder(nn.Module):
     def forward(self, global_features, impressions, imp_lengths):
         """Decode image feature vectors and generates the impression, and also global topic vector"""
         vis_embeddings = self.visual_embed(global_features)
+        #print(global_features.shape)
         ini_input = vis_embeddings.unsqueeze(1)
         # impressions embedding
         imp_embedded = self.word_embed(impressions)

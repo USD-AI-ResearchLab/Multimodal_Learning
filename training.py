@@ -55,11 +55,18 @@ def train_net(num_run, logger, args):
 
     # Models
     image_encoder = EncoderCNN().train().to(device)
+    
     impression_decoder = Impression_Decoder(args.embed_size, args.hidden_size,
                                             vocab_size, args.imp_layers_num,
                                             args.num_global_features, args.num_conv1d_out, args.teach_rate,
                                             args.max_impression_len, dropout_rate=args.dropout_rate,
                                             ).train().to(device)
+    frontal_image = torch.randn(32, 3, 224, 224).to(device)  # Example input tensor
+
+# Forward pass through the encoder
+    with torch.no_grad():
+        global_features = image_encoder(frontal_image)
+
     finding_decoder = Atten_Sen_Decoder(args.embed_size, args.hidden_size, vocab_size,
                                         args.fin_num_layers, args.sen_enco_num_layers,
                                         args.num_global_features, args.num_regions, args.num_conv1d_out, args.teach_rate,
@@ -226,6 +233,7 @@ def train_net(num_run, logger, args):
     logger.info(
         "Values of metric for the best model are: \n"
         " BLEU:{}, METEOR:{}, ROUGE:{}, Cider:{}".format(str(best_bleu),
+        
                                                          str(best_meteor),
                                                          str(best_rouge),
                                                          str(best_cider)))
@@ -326,7 +334,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     # paths
     parser.add_argument('--model_path', type=str, default='model_weights/', help='path for saving checkpoints')
-    parser.add_argument('--vocab_path', type=str, default='IUdata/data_vocab_threshold.pkl', help='path for vocabulary wrapper')
+    parser.add_argument('--vocab_path', type=str, default='IUdata/data_vocab.pkl', help='path for vocabulary wrapper')
     parser.add_argument('--image_dir', type=str, default='IUdata/FrontalView_IUXRay', help='directory for X-ray images')
     parser.add_argument('--json_dir', type=str, default='IUdata/data_trainval.json', help='the path for json file')
     parser.add_argument('--log_path', default='./results', type=str, help='The path that stores the log files.')
@@ -338,7 +346,7 @@ if __name__ == '__main__':
     parser.add_argument('--num_workers', type=int, default=4, help='multi-process data loading')
     parser.add_argument('--embed_size', type=int, default=512, help='The embed_size for vocabulary and images')
     parser.add_argument('--hidden_size', type=int, default=512, help='The number of hidden states in LSTM layers')
-    parser.add_argument('--num_global_features', type=int, default=2048,
+    parser.add_argument('--num_global_features', type=int, default=2560,
                         help='The number of global features for image encoder')
     parser.add_argument('--imp_layers_num', type=int, default=1, help='The number of LSTM layers in impression decoder')
     parser.add_argument('--fin_num_layers', type=int, default=2, help='The number of LSTM layers in finding decoder ')
@@ -352,16 +360,16 @@ if __name__ == '__main__':
     # training parameters
     parser.add_argument('--teach_rate', type=float, default=1.0, help='The teach forcing rate in training')
     parser.add_argument('--learning_rate', type=float, default=1e-4, help='The learning rate in training')
-    parser.add_argument('--epochs', type=int, default=100, help='The epochs in training')
+    parser.add_argument('--epochs', type=int, default=10, help='The epochs in training')
     parser.add_argument('--sche_step_size', type=int, default=5,
                         help='The number of epochs for decay learning rate once')
     parser.add_argument('--sche_decay', type=float, default=0.9, help='The decay rate for learning rate')
     parser.add_argument('--log_step', type=int, default=50, help='The interval of displaying the loss and perplexity')
-    parser.add_argument('--save_step', type=int, default=10, help='The interval of saving weights of models')
+    parser.add_argument('--save_step', type=int, default=2, help='The interval of saving weights of models')
     parser.add_argument('--lambda_imp', type=float, default=0.5, help='The weight value for impression loss')
     parser.add_argument('--lambda_fin', type=float, default=0.5, help='The weight value for finding loss')
     parser.add_argument('--fix_image_encoder', type=bool, default=True, help='fix the image encoder or fine-tune it')
-    parser.add_argument('--dropout_rate', type=float, default=0.2, help='The dropout rate for both encoder and decoder')
+    parser.add_argument('--dropout_rate', type=float, default=0, help='The dropout rate for both encoder and decoder')
     parser.add_argument('--log_metrics_step', type=int, default=1, help='The interval of calculate the metrics')
     parser.add_argument('--train_separately', type=bool, default=True,
                         help="Train impression decoder and finding decoder separately or jointly")
