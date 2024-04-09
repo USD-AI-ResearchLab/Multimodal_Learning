@@ -346,26 +346,26 @@ if __name__ == '__main__':
     parser.add_argument('--num_workers', type=int, default=4, help='multi-process data loading')
     parser.add_argument('--embed_size', type=int, default=512, help='The embed_size for vocabulary and images')
     parser.add_argument('--hidden_size', type=int, default=512, help='The number of hidden states in LSTM layers')
-    parser.add_argument('--num_global_features', type=int, default=2560,
+    parser.add_argument('--num_global_features', type=int, default=1280,
                         help='The number of global features for image encoder')
     parser.add_argument('--imp_layers_num', type=int, default=1, help='The number of LSTM layers in impression decoder')
     parser.add_argument('--fin_num_layers', type=int, default=2, help='The number of LSTM layers in finding decoder ')
     parser.add_argument('--sen_enco_num_layers', type=int, default=3,
                         help='The number of convolutional layer in topic encoder')
-    parser.add_argument('--num_local_features', type=int, default=2048,
+    parser.add_argument('--num_local_features', type=int, default=1280,
                         help='The channel number of local features for image encoder')
     parser.add_argument('--num_regions', type=int, default=49, help='The number of sub-regions for local features')
     parser.add_argument('--num_conv1d_out', type=int, default=1024, help='The number of output channels for 1d convolution of sentence encoder')
 
     # training parameters
     parser.add_argument('--teach_rate', type=float, default=1.0, help='The teach forcing rate in training')
-    parser.add_argument('--learning_rate', type=float, default=1e-4, help='The learning rate in training')
-    parser.add_argument('--epochs', type=int, default=10, help='The epochs in training')
+    parser.add_argument('--learning_rate', type=float, default=1e-3, help='The learning rate in training')
+    parser.add_argument('--epochs', type=int, default=50, help='The epochs in training')
     parser.add_argument('--sche_step_size', type=int, default=5,
                         help='The number of epochs for decay learning rate once')
     parser.add_argument('--sche_decay', type=float, default=0.9, help='The decay rate for learning rate')
-    parser.add_argument('--log_step', type=int, default=50, help='The interval of displaying the loss and perplexity')
-    parser.add_argument('--save_step', type=int, default=2, help='The interval of saving weights of models')
+    parser.add_argument('--log_step', type=int, default=20, help='The interval of displaying the loss and perplexity')
+    parser.add_argument('--save_step', type=int, default=10, help='The interval of saving weights of models')
     parser.add_argument('--lambda_imp', type=float, default=0.5, help='The weight value for impression loss')
     parser.add_argument('--lambda_fin', type=float, default=0.5, help='The weight value for finding loss')
     parser.add_argument('--fix_image_encoder', type=bool, default=True, help='fix the image encoder or fine-tune it')
@@ -377,7 +377,7 @@ if __name__ == '__main__':
 
     # Evaluation parameters
     parser.add_argument('--eval_json_dir', type=str, default='IUdata/data_test.json', help='the path for json file')
-    parser.add_argument('--eval_batch_size', type=int, default=75, help='batch size for loading data')
+    parser.add_argument('--eval_batch_size', type=int, default=32, help='batch size for loading data')
     parser.add_argument('--max_impression_len', type=int, default=15,
                         help='The maximum length of the impression (one or several sentences)')
     parser.add_argument('--max_single_sen_len', type=int, default=15,

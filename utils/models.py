@@ -46,40 +46,31 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 class EncoderCNN(nn.Module):
     def __init__(self):
-        """Load the pretrained EfficientNet-B7, and extract local and global features"""
+        """Load the pretrained EfficientNet-B0 and extract local and global features."""
         super(EncoderCNN, self).__init__()
 
-        # load pretrained model from ImageNet
-        efficientnet = models.efficientnet_b7(pretrained=True)
+        # Load pretrained EfficientNet-B0 from ImageNet
+        efficientnet = models.efficientnet_b0(pretrained=True)
 
-        # EfficientNet does not have an explicit layer division as ResNet, 
-        # but we can divide it based on features and classifier.
-        # Extracting features part as local feature extraction
-        self.efficientnet_local = nn.Sequential(*list(efficientnet.children())[:-2])
+        # Remove the classifier part (last two layers) to extract features
+        self.features = nn.Sequential(*list(efficientnet.children())[:-2])
 
-        # The global feature can be the output of the network without the final classifier
-        self.efficientnet_global = nn.Sequential(list(efficientnet.children())[-2])
-
-        # Print the summaries
-        print("Local Features Module Summary:")
-        print(self.efficientnet_local)
-        print("\nGlobal Features Module Summary:")
-        print(self.efficientnet_global)
+        # Initialize the model in evaluation mode
+        self.features.eval()
+        for param in self.features.parameters():
+            param.requires_grad = False
 
     def forward(self, frontal_image):
-        """Extract feature vectors from input images"""
-        # Does not train convolutional layers
+        """Extract feature vectors from input images."""
+        # Ensure no gradient is computed to save memory and computations
         with torch.no_grad():
-            # Extracting local features
-            local_features = self.efficientnet_local(frontal_image)
+            # Extract features
+            features = self.features(frontal_image)
 
-            # EfficientNet uses Adaptive Average Pooling before the final classifier,
-            # so we should apply it to get the global features.
-            global_features = self.efficientnet_global(local_features).squeeze()
-            
-        #print(global_features.shape)
-        return global_features
+            # Global feature extraction with adaptive pooling
+            global_features = torch.flatten(nn.functional.adaptive_avg_pool2d(features, 1), 1)
         
+        return global_features
 
 
 class Impression_Decoder(nn.Module):
